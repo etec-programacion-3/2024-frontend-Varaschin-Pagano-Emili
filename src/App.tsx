@@ -1,26 +1,45 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Register from './components/Register';
-import Login from './components/Login';
-import GameGrid from './components/GameGrid';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import FeaturedGames from './components/FeaturedGames';
+import GameGrid from './components/GameGrid';
+import Cart from './components/Cart';
 import Checkout from './pages/Checkout';
-import OrderConfirmation from './components/OrderConfirmation';
+import WishList from './pages/WishList';
+import { AuthPage } from './pages/AuthPage';
+import { CartProvider } from './context/CartContext';
+import { WishListProvider } from './context/WishListContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-900 text-white">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<GameGrid />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-confirmation" element={<OrderConfirmation />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <CartProvider>
+        <WishListProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-900 text-white">
+              <Navbar onCartClick={() => setIsCartOpen(true)} />
+              
+              <Routes>
+                <Route path="/" element={
+                  <main className="container mx-auto px-4 py-8">
+                    <FeaturedGames />
+                    <GameGrid />
+                  </main>
+                } />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/wishlist" element={<WishList />} />
+              </Routes>
+
+              <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+            </div>
+          </Router>
+        </WishListProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
